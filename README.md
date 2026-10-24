@@ -1,6 +1,6 @@
 # Mystic Blessings Command Centre
 
-A private planning and client tracker for Lynn at Mystic Blessings. Vercel hosts the app; Supabase provides email sign-in and stores each user's workspace.
+A private planning and client tracker for Lynn at Mystic Blessings. Vercel hosts the app; Supabase provides email-and-password sign-in and stores each user's workspace.
 
 ## Set up your live app
 
@@ -17,13 +17,13 @@ A private planning and client tracker for Lynn at Mystic Blessings. Vercel hosts
 
 6. Deploy. Copy the final Vercel address, such as `https://your-project.vercel.app`.
 7. In Supabase, open **Authentication → URL Configuration**. Set the **Site URL** to that Vercel address and add the same address to **Redirect URLs**. Sign-in links must return to this site.
-8. Open the Vercel site and sign in with your email. For the default Supabase email service, use an address that belongs to a member of the Supabase project team. To send sign-in links to another address, configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp) first.
+8. Open the Vercel site and sign in with the email and password of a user you created under **Supabase Authentication → Users**. If that user has no password, the email-link button is available as a fallback. Supabase's default email service sends links only to project team members; sending links elsewhere requires [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp).
 
 The first sign-in creates an empty private workspace with the Christmas planning tasks. Keep the site address private if you prefer, although its client records remain protected by sign-in and database access rules.
 
 ### If sign-in returns HTTP 429
 
-Check your inbox for an earlier link and use it before requesting another. Supabase normally allows one magic-link request per email address per 60 seconds. Its built-in mail service is also limited to two emails per project per hour. If you reached that hourly limit, wait for it to reset or configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp). Supabase shows your project's limits under **Authentication → Rate Limits**. The sign-in screen temporarily disables repeat requests and displays the Auth error code when available.
+The email-and-password sign-in does not send an email, so use it if your Supabase user has a password. For the optional email-link button, check your inbox for an earlier link before requesting another. Supabase normally allows one magic-link request per email address per 60 seconds. Its built-in mail service is also limited to two emails per project per hour. If you reached that hourly limit, wait for it to reset or configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp). Supabase shows your project's limits under **Authentication → Rate Limits**. The sign-in screen temporarily disables repeat link requests and displays the Auth error code when available.
 
 ## Features
 

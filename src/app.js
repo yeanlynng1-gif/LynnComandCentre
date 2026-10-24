@@ -6,7 +6,7 @@ import { createClient } from "@supabase/supabase-js";
       var supabaseKey=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       var supabase=supabaseUrl&&supabaseKey?createClient(supabaseUrl,supabaseKey):null;
       var activeUserId=null,openToken=0,saveVersion=0,unsynced=false,syncQueue=Promise.resolve();
-      var otpCooldownKey="mystic-blessings-otp-cooldown-until",otpCooldownUntil=0,otpSending=false;
+      var otpCooldownKey="mystic-blessings-otp-cooldown-until",otpCooldownUntil=0,otpSending=false,passwordSending=false;
       try{otpCooldownUntil=Math.min(Number(localStorage.getItem(otpCooldownKey))||0,Date.now()+300000);}catch(e){}
       var defaultEvent={eventDate:"",eventFormat:"In person",venue:"",tarotFormat:"Group reflection",ticketPrice:"",expectedGuests:"15",venueCost:"",materialsPerGuest:"",fixedCosts:"",desiredEarnings:""};
       var defaultTasks=[
@@ -37,19 +37,21 @@ import { createClient } from "@supabase/supabase-js";
       }
       function save(){render();persist();}
       function authMessage(message,error){var e=qs("#authMessage");e.textContent=message;e.classList.toggle("error",!!error);}
-      function updateOtpButton(){
-        var button=qs("#authForm button"),seconds=Math.max(0,Math.ceil((otpCooldownUntil-Date.now())/1000));
-        button.disabled=otpSending||seconds>0;
-        button.textContent=otpSending?"Sending…":seconds>0?"Try again in "+seconds+"s":"Send sign-in link";
-        clearTimeout(updateOtpButton.timer);
-        if(seconds>0)updateOtpButton.timer=setTimeout(updateOtpButton,1000);
+      function updateAuthButtons(){
+        var linkButton=qs("#otpButton"),passwordButton=qs("#passwordSignInBtn"),seconds=Math.max(0,Math.ceil((otpCooldownUntil-Date.now())/1000));
+        linkButton.disabled=otpSending||passwordSending||seconds>0;
+        linkButton.textContent=otpSending?"Sending…":seconds>0?"Try email link again in "+seconds+"s":"Email me a sign-in link";
+        passwordButton.disabled=passwordSending||otpSending;
+        passwordButton.textContent=passwordSending?"Signing in…":"Sign in";
+        clearTimeout(updateAuthButtons.timer);
+        if(seconds>0)updateAuthButtons.timer=setTimeout(updateAuthButtons,1000);
       }
       function setOtpCooldown(seconds){
         otpCooldownUntil=Date.now()+seconds*1000;
         try{localStorage.setItem(otpCooldownKey,String(otpCooldownUntil));}catch(e){}
-        updateOtpButton();
+        updateAuthButtons();
       }
-      function showGate(){qs("#app").hidden=true;qs("#authGate").hidden=false;authMessage("Enter your email to receive a sign-in link.");}
+      function showGate(){qs("#app").hidden=true;qs("#authGate").hidden=false;authMessage("Enter your email and password to sign in.");}
       async function openSession(session){
         if(!session||!session.user){activeUserId=null;state=blankState();showGate();return;}
         var userId=session.user.id;
@@ -200,9 +202,25 @@ import { createClient } from "@supabase/supabase-js";
       qs("#signOutBtn").onclick=async function(){if(unsynced&&!confirm("Your latest changes have not saved. Sign out anyway?"))return;var result=await supabase.auth.signOut();if(result.error)toast("Could not sign out. Please try again.");};
       qs("#authForm").addEventListener("submit",async function(e){
         e.preventDefault();
-        if(!supabase||otpSending||Date.now()<otpCooldownUntil)return;
+        if(!supabase||passwordSending||otpSending)return;
+        var email=qs("#authEmail").value.trim(),password=qs("#authPassword").value;
+        passwordSending=true;updateAuthButtons();authMessage("Signing in…");
+        try{
+          var result=await supabase.auth.signInWithPassword({email:email,password:password});
+          if(result.error){
+            authMessage(result.error.code==="invalid_credentials"?"Email or password did not match. If this user has no password yet, use the email link after the limit resets or set a password in Supabase.":result.error.message,true);
+          }else{
+            qs("#authPassword").value="";
+            authMessage("Opening your workspace…");
+          }
+        }catch(e){authMessage("Could not reach Supabase. Check your connection and try again.",true);}
+        passwordSending=false;updateAuthButtons();
+      });
+      qs("#otpButton").addEventListener("click",async function(e){
+        e.preventDefault();
+        if(!supabase||otpSending||passwordSending||Date.now()<otpCooldownUntil||!qs("#authEmail").reportValidity())return;
         var email=qs("#authEmail").value.trim();
-        otpSending=true;updateOtpButton();authMessage("Sending your link…");
+        otpSending=true;updateAuthButtons();authMessage("Sending your link…");
         try{
           var result=await supabase.auth.signInWithOtp({email:email,options:{emailRedirectTo:window.location.origin}});
           if(result.error){
@@ -214,10 +232,10 @@ import { createClient } from "@supabase/supabase-js";
             authMessage("Check your email for the sign-in link. Please use that link before requesting another.");
           }
         }catch(e){authMessage("Could not reach Supabase. Check your connection and try again.",true);}
-        otpSending=false;updateOtpButton();
+        otpSending=false;updateAuthButtons();
       });
       window.addEventListener("beforeunload",function(e){if(unsynced){e.preventDefault();e.returnValue="";}});
-      updateOtpButton();
+      updateAuthButtons();
       if(!supabase){authMessage("This site is missing its Supabase configuration.",true);return;}
       supabase.auth.onAuthStateChange(function(event,session){
         if(event==="INITIAL_SESSION"||event==="SIGNED_IN")setTimeout(function(){openSession(session);},0);

@@ -172,8 +172,13 @@
     <div class="auth-card">
       <div class="brand"><div class="brand-mark" aria-hidden="true">✦</div><div><strong>Mystic Blessings</strong><small>Lynn's workspace</small></div></div>
       <h1>Welcome back</h1>
-      <p>Sign in with your email to open your private command centre. We’ll send you a one-time link.</p>
-      <form id="authForm"><label>Email address<input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label><button class="btn btn-primary" type="submit">Send sign-in link</button></form>
+      <p>Sign in with the email and password for your Supabase user.</p>
+      <form id="authForm">
+        <label>Email address<input id="authEmail" type="email" autocomplete="username" required placeholder="you@example.com"></label>
+        <label>Password<input id="authPassword" type="password" autocomplete="current-password" required></label>
+        <button class="btn btn-primary" id="passwordSignInBtn" type="submit">Sign in</button>
+        <button class="btn" id="otpButton" type="button">Email me a sign-in link</button>
+      </form>
       <p class="auth-message" id="authMessage" role="status" aria-live="polite">Checking your sign-in…</p>
     </div>
   </div>
