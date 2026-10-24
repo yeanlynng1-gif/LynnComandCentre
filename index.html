@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#20362d">
+  <title>Mystic Blessings · Command Centre</title>
+  <style>
+    :root{--forest:#20362d;--forest-2:#315344;--sage:#e7ede5;--cream:#f8f6f0;--paper:#fffefa;--ink:#26342d;--muted:#6b776d;--line:#dfe5dc;--gold:#be9057;--peach:#f3ded0;--red:#a75649;--shadow:0 16px 40px rgba(24,45,33,.07)}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.5 "Segoe UI",Arial,sans-serif}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #d6a56d;outline-offset:2px}
+    .app{min-height:100vh;display:grid;grid-template-columns:238px minmax(0,1fr)}
+    .sidebar{background:var(--forest);color:#f4f5ec;padding:30px 20px;display:flex;flex-direction:column;gap:34px}
+    .brand{display:flex;align-items:center;gap:12px;padding:2px 8px}
+    .brand-mark{width:39px;height:39px;border:1px solid rgba(231,222,183,.65);border-radius:13px;display:grid;place-items:center;color:#e9d6af;font-family:Georgia,serif;font-size:24px}
+    .brand strong{display:block;font-family:Georgia,serif;font-weight:500;font-size:18px;line-height:1.1;letter-spacing:.01em}
+    .brand small{color:#c0cdbd;font-size:10px;letter-spacing:.17em;text-transform:uppercase}
+    .sidebar-label{font-size:10px;letter-spacing:.19em;text-transform:uppercase;color:#a6b9a8;padding:0 15px;margin-bottom:10px}
+    .nav{display:grid;gap:5px}
+    .nav button{width:100%;border:0;background:transparent;color:#d9e2d8;padding:12px 14px;text-align:left;border-radius:11px;display:flex;align-items:center;gap:12px}
+    .nav button:hover,.nav button.active{background:#3a5949;color:#fff}
+    .nav span:first-child{width:20px;text-align:center;font-size:18px;font-family:Georgia,serif;color:#e2c898}
+    .sidebar-note{margin-top:auto;border-top:1px solid #4a6253;padding:22px 11px 0;color:#c0cdbd;font-size:12px;line-height:1.55}
+    .sidebar-note strong{display:block;color:#fff;font-weight:600;margin-bottom:3px}
+    .main{min-width:0;padding:0 44px 50px}
+    .topbar{height:82px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line)}
+    .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--forest-2);font-weight:700}
+    .topbar .eyebrow{color:var(--muted)}
+    .top-actions{display:flex;align-items:center;gap:9px}
+    .date-label{font-size:13px;color:var(--muted);margin-right:9px}
+    .btn{border:1px solid var(--line);border-radius:9px;padding:9px 13px;background:var(--paper);color:var(--forest);font-weight:600;min-height:39px}
+    .btn:hover{border-color:#91a99a;background:#f4f8f2}
+    .btn-primary{background:var(--forest);color:#fff;border-color:var(--forest)}
+    .btn-primary:hover{background:var(--forest-2);color:#fff}
+    .btn-small{padding:6px 10px;min-height:32px;font-size:12px}
+    .btn-quiet{border-color:transparent;background:transparent;color:var(--muted)}
+    .btn-quiet:hover{color:var(--forest);background:var(--sage)}
+    .view{display:none;max-width:1350px;margin:0 auto}
+    .view.active{display:block}
+    .page-head{padding:37px 0 26px;display:flex;align-items:end;justify-content:space-between;gap:18px}
+    h1,h2,h3,p{margin-top:0}
+    h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:500}
+    h1{font-size:clamp(31px,3.5vw,49px);line-height:1.13;letter-spacing:-.035em;margin:8px 0 8px}
+    .page-head p{color:var(--muted);margin:0}
+    h2{font-size:25px;line-height:1.2;margin-bottom:5px}
+    h3{font-size:19px;margin-bottom:7px}
+    .focus{position:relative;overflow:hidden;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center;background:var(--forest);color:#f7f8f1;border-radius:17px;padding:29px 32px;box-shadow:var(--shadow)}
+    .focus:after{content:"✦";position:absolute;right:135px;top:-54px;color:rgba(240,220,173,.10);font:190px Georgia,serif;pointer-events:none}
+    .focus .eyebrow{color:#dbbd8d}
+    .focus h2{font-size:29px;margin:7px 0}
+    .focus p{color:#d7e3d7;max-width:660px;margin:0}
+    .focus button{position:relative;z-index:1;background:#f1ddbf;border-color:#f1ddbf;color:var(--forest)}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0 28px}
+    .stat,.panel{background:var(--paper);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+    .stat{padding:18px 20px}
+    .stat .number{font:34px/1 Georgia,serif;margin:15px 0 4px}
+    .stat small{font-size:12px;color:var(--muted)}
+    .stat .mark{float:right;color:var(--gold);font:24px Georgia,serif}
+    .section-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.85fr);gap:17px}
+    .panel{padding:24px}
+    .panel-head{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:16px}
+    .panel-head p{font-size:13px;color:var(--muted);margin:0}
+    .list{display:grid;gap:10px}
+    .item{display:flex;align-items:center;gap:13px;padding:13px 0;border-top:1px solid var(--line)}
+    .item:first-child{border-top:0}
+    .item-body{min-width:0;flex:1}
+    .item strong{display:block;font-size:14px;font-weight:650}
+    .item small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+    .item-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:none}
+    .dot.red{background:var(--red)}
+    .dot.green{background:#6b9c72}
+    .tag{display:inline-flex;border-radius:99px;padding:4px 8px;background:var(--sage);color:var(--forest-2);font-size:11px;font-weight:700;white-space:nowrap}
+    .tag.warm{background:#f8ecda;color:#8a633a}
+    .tag.rose{background:#f9e5e1;color:#9c4e45}
+    .progress{height:8px;border-radius:99px;background:#e8ede6;overflow:hidden;margin:17px 0 8px}
+    .progress span{display:block;height:100%;background:var(--gold);border-radius:99px}
+    .event-meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+    #eventOverviewText{white-space:pre-line}
+    .event-meta span{background:var(--sage);padding:6px 10px;border-radius:7px;color:var(--forest-2);font-size:12px}
+    .subtle{color:var(--muted);font-size:13px}
+    .card-row{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+    .guide-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:21px}
+    .guide-card .step{font:22px Georgia,serif;color:var(--gold);margin-bottom:17px}
+    .guide-card p{font-size:13px;color:var(--muted);margin-bottom:0}
+    .section-title{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:4px 0 18px}
+    .section-title p{color:var(--muted);margin:0}
+    .form-panel{display:none;margin-bottom:18px}
+    .form-panel.open{display:block}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    label{display:grid;gap:6px;font-size:12px;font-weight:700;color:var(--forest)}
+    input,select,textarea{width:100%;border:1px solid #cdd7cd;border-radius:9px;background:#fff;padding:10px 11px;color:var(--ink)}
+    textarea{min-height:75px;resize:vertical}
+    .full{grid-column:1/-1}
+    .form-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:18px}
+    .client-list,.task-list{display:grid;gap:12px}
+    .record{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 19px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+    .record h3{font-size:19px;margin:3px 0}
+    .record p{color:var(--muted);font-size:13px;margin:0}
+    .record .record-actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+    .record .meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+    .empty{border:1px dashed #bdc9be;border-radius:14px;padding:32px;text-align:center;background:rgba(255,255,255,.55)}
+    .empty h3{margin:0 0 7px}
+    .empty p{color:var(--muted);margin:0}
+    .task-done h3{text-decoration:line-through;color:var(--muted)}
+    .task-done{opacity:.7}
+    .check{width:22px;height:22px;accent-color:var(--forest);flex:none}
+    .sop{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:0 0 22px}
+    .sop div{padding:16px;background:var(--sage);border-radius:11px}
+    .sop b{display:block;font:21px Georgia,serif;color:var(--gold);margin-bottom:10px}
+    .sop strong{display:block;font-size:13px}
+    .sop small{display:block;color:var(--muted);margin-top:4px}
+    .template-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .template-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:21px}
+    .template-card p{white-space:pre-line;font-size:13px;color:var(--muted);min-height:90px}
+    .template-card h3{margin-bottom:9px}
+    .notice{background:#f5eadb;border:1px solid #ead3b5;color:#775c3e;padding:12px 15px;border-radius:10px;font-size:13px;margin-bottom:18px}
+    .strategy-lead{background:linear-gradient(120deg,#e8eee5,#f7f1e6);border:1px solid #dce7d9;border-radius:16px;padding:27px 29px;margin-bottom:17px}
+    .strategy-lead h2{font-size:clamp(26px,2.6vw,36px);margin:7px 0 8px}
+    .strategy-lead p{max-width:750px;color:#475e4c;margin:0}
+    .strategy-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}
+    .strategy-chips span{font-size:12px;padding:6px 10px;border:1px solid #c8d8c7;border-radius:99px;background:rgba(255,255,255,.6)}
+    .event-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.9fr);gap:17px;margin-bottom:25px}
+    .strategy-list{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:15px}
+    .strategy-list li{display:grid;grid-template-columns:28px 1fr;gap:10px}
+    .strategy-list b{font:20px Georgia,serif;color:var(--gold)}
+    .strategy-list strong{display:block;font-size:14px}
+    .strategy-list span{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+    .event-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .price-result{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}
+    .price-result div{background:var(--sage);border-radius:9px;padding:11px}
+    .price-result small{display:block;color:var(--muted);font-size:11px}
+    .price-result strong{display:block;font:21px Georgia,serif;margin-top:4px}
+    .run-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:24px}
+    .run-step{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:17px}
+    .run-step small{font-weight:700;letter-spacing:.08em;color:var(--gold)}
+    .run-step strong{display:block;margin:8px 0 5px}
+    .run-step p{font-size:12px;color:var(--muted);margin:0}
+    .timeline{display:grid;gap:13px;margin:15px 0 0}
+    .timeline-row{border-left:2px solid #d3dfd2;padding-left:15px}
+    .timeline-row strong{display:block;font-size:14px}
+    .timeline-row p{font-size:13px;color:var(--muted);margin:3px 0 0}
+    .event-section{margin-top:26px}
+    .toast{position:fixed;bottom:22px;right:22px;max-width:300px;background:var(--forest);color:#fff;padding:11px 16px;border-radius:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:4}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .mobile-nav{display:none}
+    @media(max-width:1050px){.main{padding:0 25px 40px}.section-grid,.event-grid{grid-template-columns:1fr}.sop{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:760px){.app{display:block}.sidebar{display:none}.main{padding:0 17px 94px}.topbar{height:auto;min-height:76px;padding:13px 0;align-items:start;flex-direction:column;gap:8px}.top-actions{width:100%;justify-content:flex-end}.date-label{display:none}.top-actions .btn{padding:7px 9px;font-size:12px}.page-head{padding:30px 0 22px;align-items:start}.page-head .btn{white-space:nowrap}.focus{grid-template-columns:1fr;padding:24px}.focus h2{font-size:25px}.focus button{justify-self:start}.stats{grid-template-columns:repeat(2,1fr)}.panel{padding:20px}.record{align-items:start;flex-direction:column}.record .record-actions{justify-content:flex-start}.sop{grid-template-columns:repeat(2,1fr)}.template-grid,.card-row{grid-template-columns:1fr}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--forest);padding:8px 7px max(8px,env(safe-area-inset-bottom));justify-content:space-around;z-index:3;box-shadow:0 -6px 20px rgba(0,0,0,.12)}.mobile-nav button{border:0;background:transparent;color:#dce7dc;font-size:11px;padding:6px 10px;border-radius:8px;display:grid;gap:1px;justify-items:center}.mobile-nav button.active{background:#3d5d4b;color:#fff}.mobile-nav span{font:20px Georgia,serif;color:#e2c898}.toast{bottom:82px;left:15px;right:15px;max-width:none}}
+    @media(max-width:760px){.run-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.strategy-lead{padding:23px}.event-form-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.page-head{display:block}.page-head .btn{margin-top:17px}.section-title{align-items:start}.sop{grid-template-columns:1fr 1fr}.topbar .eyebrow{font-size:10px}.run-grid{grid-template-columns:1fr}.price-result{grid-template-columns:1fr 1fr}.event-form-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">✦</div><div><strong>Mystic Blessings</strong><small>Lynn's workspace</small></div></div>
+      <div><div class="sidebar-label">Your space</div><nav class="nav" aria-label="Main navigation">
+        <button type="button" class="active" data-view="overview"><span>◈</span> Overview</button>
+        <button type="button" data-view="clients"><span>◇</span> Client desk</button>
+        <button type="button" data-view="events"><span>✧</span> Events & tasks</button>
+        <button type="button" data-view="playbook"><span>≡</span> My playbook</button>
+      </nav></div>
+      <div class="sidebar-note"><strong>Made for your real work.</strong>Your data stays in this browser until you export it. Keep a backup if you rely on this tool.</div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div class="eyebrow">Mystic Blessings / Command Centre</div><div class="top-actions"><span class="date-label" id="todayLabel"></span><button class="btn btn-small" id="exportBtn" type="button">Export backup</button><button class="btn btn-small" id="importBtn" type="button">Import</button><input id="importFile" type="file" accept="application/json,.json" hidden></div></header>
+
+      <section id="overview" class="view active" aria-labelledby="overviewTitle">
+        <div class="page-head"><div><div class="eyebrow">Good to see you, Lynn</div><h1 id="overviewTitle">A little more room to breathe.</h1><p>Your clients, your Christmas event, and the next useful thing to do.</p></div></div>
+        <div class="focus"><div><div class="eyebrow">Your next best move</div><h2 id="focusTitle">Decide your Christmas event date</h2><p id="focusText">Choose two possible dates in mid-December so you can confirm the venue and open bookings.</p></div><button class="btn" id="focusButton" type="button">See task →</button></div>
+        <div class="stats">
+          <div class="stat"><span class="eyebrow">New enquiries</span><span class="mark">◇</span><div class="number" id="newCount">0</div><small>Ready for your reply</small></div>
+          <div class="stat"><span class="eyebrow">Awaiting payment</span><span class="mark">◌</span><div class="number" id="paymentCount">0</div><small>Verify before confirming</small></div>
+          <div class="stat"><span class="eyebrow">Tasks due soon</span><span class="mark">✦</span><div class="number" id="dueCount">0</div><small>Within the next seven days</small></div>
+          <div class="stat"><span class="eyebrow">Confirmed clients</span><span class="mark">✧</span><div class="number" id="confirmedCount">0</div><small>Appointments on your list</small></div>
+        </div>
+        <div class="section-grid">
+          <div class="panel"><div class="panel-head"><div><h2>On your radar</h2><p>A short list for today, based on your records.</p></div><button class="btn btn-small" type="button" data-go="events">All tasks</button></div><div class="list" id="priorityList"></div></div>
+          <div class="panel"><div class="panel-head"><div><div class="eyebrow">Upcoming gathering</div><h2>Christmas holistic event</h2></div><span class="tag warm" id="eventDateTag">Mid-Dec 2026</span></div><p class="subtle" id="eventOverviewText">Tarot reflection · Meditation · Short sound bath · Manifesting<br>Group of up to 25 · Price and venue to confirm</p><div class="progress"><span id="eventProgress"></span></div><p class="subtle" id="eventProgressText">0 of 0 planning tasks complete</p><div class="event-meta"><span>QR payment via WhatsApp</span><span>Small group experience</span></div><button class="btn btn-small" type="button" data-go="events">Open event plan →</button></div>
+        </div>
+      </section>
+
+      <section id="clients" class="view" aria-labelledby="clientsTitle">
+        <div class="page-head"><div><div class="eyebrow">Keep every conversation moving</div><h1 id="clientsTitle">Client desk</h1><p>From first WhatsApp enquiry to a thoughtful follow-up.</p></div><button class="btn btn-primary" type="button" id="showClientForm">+ Add enquiry</button></div>
+        <div class="notice">This is a private tracker on this browser. Send messages and your payment QR through WhatsApp yourself; confirm a booking only after you have checked payment.</div>
+        <form id="clientForm" class="panel form-panel">
+          <div class="panel-head"><div><h2>New client enquiry</h2><p>Only add details you need to manage the booking.</p></div></div>
+          <div class="form-grid">
+            <label>Client name <input name="name" maxlength="80" required autocomplete="off"></label>
+            <label>Service <select name="service"><option>Tarot reading</option><option>Sound healing</option><option>Pet communication</option><option>Other</option></select></label>
+            <label>WhatsApp number (optional) <input name="phone" maxlength="30" inputmode="tel" autocomplete="off"></label>
+            <label>Appointment date (optional) <input name="sessionDate" type="date"></label>
+            <label>Follow-up date (optional) <input name="followUp" type="date"></label>
+            <label class="full">Context or next step <textarea name="note" maxlength="500" placeholder="What did they ask, and what needs to happen next?"></textarea></label>
+          </div>
+          <div class="form-actions"><button class="btn" type="button" id="cancelClientForm">Cancel</button><button class="btn btn-primary" type="submit">Save enquiry</button></div>
+        </form>
+        <div class="section-title"><div><h2>Conversations</h2><p id="clientSummary">No clients added yet.</p></div></div>
+        <div class="client-list" id="clientList"></div>
+      </section>
+
+      <section id="events" class="view" aria-labelledby="eventsTitle">
+        <div class="page-head"><div><div class="eyebrow">Plan it once, run it calmly</div><h1 id="eventsTitle">Events & tasks</h1><p>Your Christmas gathering is already mapped. Add the details as you confirm them.</p></div><button class="btn btn-primary" id="showTaskForm" type="button">+ Add task</button></div>
+        <div class="notice" id="eventNotice">Christmas event: mid-December 2026 · Maximum 25 guests · Ticket price, exact date, and venue still to confirm. Planning dates below are suggested targets.</div>
+        <div class="strategy-lead">
+          <div class="eyebrow">Working concept · Christmas 2026</div>
+          <h2>A year-end pause with a practical way forward</h2>
+          <p>Invite people to slow down, reflect on what this year has brought, and leave with one written intention and one small action for the next seven days. Mystic Blessings brings the spiritual space; Lynn brings the honest, useful guidance.</p>
+          <div class="strategy-chips"><span>Up to 25 guests</span><span>Two-hour draft</span><span>Tarot + meditation + sound + manifesting</span></div>
+        </div>
+        <div class="event-grid">
+          <article class="panel">
+            <div class="eyebrow">The strategy</div><h2>Make the experience easy to say yes to</h2>
+            <ol class="strategy-list">
+              <li><b>01</b><div><strong>Lead with the result, then name the activities.</strong><span>Use “a calm year-end reset and a clear next step” as the main promise. Explain the tarot, meditation, sound bath, and manifesting underneath it. Avoid promising a prediction or guaranteed healing.</span></div></li>
+              <li><b>02</b><div><strong>Keep the first version manageable.</strong><span>Use a group tarot reflection for 25 guests. If you want personal readings, set a shorter guest list, add readers, or create a separate paid option.</span></div></li>
+              <li><b>03</b><div><strong>Set the price from costs and likely turnout.</strong><span>Plan with a realistic number of paying guests, not a full room. Include your own time and preparation in the earnings you want from the event.</span></div></li>
+              <li><b>04</b><div><strong>Make WhatsApp the booking desk.</strong><span>One clear event message, one QR payment step, one guest list, and one confirmation after you verify payment. Share updates with people who have asked to hear about the event.</span></div></li>
+            </ol>
+          </article>
+          <form id="eventDetailsForm" class="panel">
+            <div class="panel-head"><div><div class="eyebrow">Decisions & pricing</div><h2>Fill in what you know</h2><p>These details stay in this browser and update your event summary.</p></div></div>
+            <div class="event-form-grid">
+              <label>Event date <input name="eventDate" type="date"></label>
+              <label>Format <select name="eventFormat"><option value="In person">In person</option><option value="Online">Online</option></select></label>
+              <label class="full">Venue or online platform <input name="venue" maxlength="120" placeholder="Still to confirm"></label>
+              <label>Tarot format <select name="tarotFormat"><option value="Group reflection">Group reflection</option><option value="Individual mini readings">Individual mini readings</option></select></label>
+              <label>Ticket price (RM) <input name="ticketPrice" type="number" min="0" step="0.01" inputmode="decimal"></label>
+              <label>Expected paid guests <input name="expectedGuests" type="number" min="1" max="25" step="1" value="15"></label>
+              <label>Venue cost (RM) <input name="venueCost" type="number" min="0" step="0.01" inputmode="decimal"></label>
+              <label>Materials per guest (RM) <input name="materialsPerGuest" type="number" min="0" step="0.01" inputmode="decimal"></label>
+              <label>Helpers / other fixed costs (RM) <input name="fixedCosts" type="number" min="0" step="0.01" inputmode="decimal"></label>
+              <label>Pay yourself / desired earnings (RM) <input name="desiredEarnings" type="number" min="0" step="0.01" inputmode="decimal"></label>
+            </div>
+            <div class="price-result" aria-live="polite"><div><small>Estimated costs</small><strong id="estimatedCost">Add costs</strong></div><div><small>Break-even / ticket</small><strong id="breakEven">Add costs</strong></div><div><small>Cost + earnings / ticket</small><strong id="targetPrice">Add costs</strong></div></div>
+            <p class="subtle" id="pricingNote">15 expected guests is a planning assumption; your maximum capacity is 25. This calculation excludes payment fees unless you include them in fixed costs.</p>
+            <div class="form-actions"><button class="btn btn-primary" type="submit">Save event details</button></div>
+          </form>
+        </div>
+        <div class="section-title"><div><div class="eyebrow">Delivery plan</div><h2>Two-hour run of show</h2><p>Draft timings for a group of 25. Rehearse once and adjust for your venue.</p></div></div>
+        <div class="run-grid">
+          <div class="run-step"><small>00:00–00:10</small><strong>Welcome & settle</strong><p>Check names against the paid guest list. Explain the flow, comfort options, and group boundaries.</p></div>
+          <div class="run-step"><small>00:10–00:25</small><strong>Guided meditation</strong><p>Use one grounding prompt. Invite guests to sit or rest in the way that works for them.</p></div>
+          <div class="run-step"><small>00:25–01:00</small><strong>Group tarot reflection</strong><p>Choose a shared theme, draw cards, then give each guest a written reflection prompt.</p></div>
+          <div class="run-step"><small>01:00–01:20</small><strong>Short sound bath</strong><p>Test the room and sound level before guests arrive. Give a quiet seating option.</p></div>
+          <div class="run-step"><small>01:20–01:50</small><strong>Manifest & make it real</strong><p>Guests write one intention, one action for the next seven days, and what might get in the way.</p></div>
+          <div class="run-step"><small>01:50–02:00</small><strong>Close & connect</strong><p>Invite a voluntary share, explain follow-up, and let guests leave without feeling rushed.</p></div>
+        </div>
+        <div class="section-grid">
+          <article class="panel"><div class="eyebrow">Before the event</div><h2>Promotion plan</h2>
+            <div class="timeline">
+              <div class="timeline-row"><strong>Now: decide the offer</strong><p>Lock date, venue, format, group tarot approach, costs, price, and cancellation terms. Then write one short invitation with who it is for, what happens, and how to book.</p></div>
+              <div class="timeline-row"><strong>About four weeks out: open bookings</strong><p>Start with people who have asked for event updates and your existing content channels. Share the experience, the practical takeaway, and the booking steps. Track enquiries and paid places separately.</p></div>
+              <div class="timeline-row"><strong>Weekly: show a piece of the experience</strong><p>Use one post or message each week: a reflection prompt, a short introduction to the sound bath, a look at the venue, or an explanation of the tarot group format. Answer real questions you receive.</p></div>
+              <div class="timeline-row"><strong>Ten days out: review bookings</strong><p>Compare paid places with your minimum viable turnout. Decide whether to increase outreach, simplify costs, or make another clear call to action.</p></div>
+            </div>
+          </article>
+          <article class="panel"><div class="eyebrow">On the ground</div><h2>Booking & delivery checklist</h2>
+            <div class="timeline">
+              <div class="timeline-row"><strong>Booking SOP</strong><p>Enquiry → send confirmed details → send QR → check payment → add name to guest list → send confirmation. Record dietary or access needs only if relevant to your venue and with care.</p></div>
+              <div class="timeline-row"><strong>Three days before</strong><p>Reconcile paid names, send time, map or link, arrival instructions, and what to bring. Prepare cards, instruments, pens, paper, water, and a timer.</p></div>
+              <div class="timeline-row"><strong>Event day</strong><p>Arrive early to test sound, arrange seating, set up check-in, and walk through the transitions. Keep the run sheet in front of you; leave a little buffer.</p></div>
+              <div class="timeline-row"><strong>Within two days after</strong><p>Send a warm thank-you and one practical reflection question. Note attendance, costs, common questions, and what to improve next time.</p></div>
+            </div>
+          </article>
+        </div>
+        <div class="event-section"></div>
+        <form id="taskForm" class="panel form-panel">
+          <div class="panel-head"><div><h2>Add a task</h2><p>Make it small enough to finish in one sitting.</p></div></div>
+          <div class="form-grid">
+            <label class="full">Task <input name="title" maxlength="130" required autocomplete="off"></label>
+            <label>Due date <input name="due" type="date"></label>
+            <label>Priority <select name="priority"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></label>
+            <label>Area <select name="category"><option>Christmas event</option><option>Client work</option><option>Business operations</option><option>Future event</option></select></label>
+            <label class="full">Notes (optional) <textarea name="note" maxlength="500"></textarea></label>
+          </div>
+          <div class="form-actions"><button class="btn" type="button" id="cancelTaskForm">Cancel</button><button class="btn btn-primary" type="submit">Save task</button></div>
+        </form>
+        <div class="section-title"><div><h2>Planning list</h2><p id="taskSummary"></p></div></div>
+        <div class="task-list" id="taskList"></div>
+      </section>
+
+      <section id="playbook" class="view" aria-labelledby="playbookTitle">
+        <div class="page-head"><div><div class="eyebrow">Your repeatable way of working</div><h1 id="playbookTitle">My playbook</h1><p>Simple steps and words you can use again tomorrow.</p></div></div>
+        <h2>Booking SOP</h2><div class="sop"><div><b>01</b><strong>Reply to enquiry</strong><small>Clarify the service and what they need.</small></div><div><b>02</b><strong>Share details</strong><small>Offer date, format, and price once confirmed.</small></div><div><b>03</b><strong>Send your QR</strong><small>Attach the payment QR in WhatsApp.</small></div><div><b>04</b><strong>Verify payment</strong><small>Check your account before marking confirmed.</small></div><div><b>05</b><strong>Follow up</strong><small>Send a useful, human check-in after the session.</small></div></div>
+        <div class="section-title"><div><h2>WhatsApp message starters</h2><p>Copy, personalize, then send from your own WhatsApp.</p></div></div>
+        <div class="template-grid" id="templateGrid"></div>
+      </section>
+    </main>
+  </div>
+  <nav class="mobile-nav" aria-label="Mobile navigation"><button class="active" type="button" data-view="overview"><span>◈</span>Home</button><button type="button" data-view="clients"><span>◇</span>Clients</button><button type="button" data-view="events"><span>✧</span>Events</button><button type="button" data-view="playbook"><span>≡</span>Playbook</button></nav>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+    (function(){
+      "use strict";
+      var KEY="mystic-blessings-command-centre-v1";
+      var defaultEvent={eventDate:"",eventFormat:"In person",venue:"",tarotFormat:"Group reflection",ticketPrice:"",expectedGuests:"15",venueCost:"",materialsPerGuest:"",fixedCosts:"",desiredEarnings:""};
+      var defaultTasks=[
+        {id:"event-date",title:"Choose two dates and confirm the event format",due:"2026-10-31",priority:"high",category:"Christmas event",note:"Decide in person or online, and choose group or individual tarot.",done:false},
+        {id:"event-venue",title:"Confirm venue or online platform for up to 25 guests",due:"2026-11-07",priority:"high",category:"Christmas event",note:"Check space, seating, sound bath setup, and accessibility.",done:false},
+        {id:"event-price",title:"List costs and set the ticket price",due:"2026-11-07",priority:"high",category:"Christmas event",note:"Use a realistic minimum turnout, not a full 25 seats.",done:false},
+        {id:"event-booking",title:"Set your WhatsApp and QR payment booking steps",due:"2026-11-07",priority:"high",category:"Christmas event",note:"Enquiry → details → QR → verify payment → confirm place.",done:false},
+        {id:"event-launch",title:"Write announcement and open bookings",due:"2026-11-14",priority:"high",category:"Christmas event",note:"Include only confirmed date, venue, format, and price.",done:false},
+        {id:"event-check",title:"Review paid places and answer open enquiries",due:"2026-11-28",priority:"medium",category:"Christmas event",note:"Check whether the event needs another round of promotion.",done:false},
+        {id:"event-run",title:"Prepare scripts, materials, and sound setup",due:"2026-12-07",priority:"high",category:"Christmas event",note:"Meditation, tarot reflection, sound bath, and manifesting activity.",done:false},
+        {id:"event-reminder",title:"Check guest list and prepare attendee reminder",due:"2026-12-10",priority:"high",category:"Christmas event",note:"Adjust this target when the event date is fixed.",done:false}
+      ];
+      var state=loadState();
+      var currentView="overview";
+      function cloneDefaults(){return defaultTasks.map(function(t){return Object.assign({},t);});}
+      function loadState(){try{var saved=JSON.parse(localStorage.getItem(KEY));if(saved&&Array.isArray(saved.clients)&&Array.isArray(saved.tasks)){saved.event=cleanEvent(saved.event);return saved;}}catch(e){}return{clients:[],tasks:cloneDefaults(),event:Object.assign({},defaultEvent)};}
+      function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){toast("Could not save in this browser. Export a backup.");}render();}
+      function qs(s){return document.querySelector(s);}
+      function make(tag,cls,content){var e=document.createElement(tag);if(cls)e.className=cls;if(content!==undefined)e.textContent=content;return e;}
+      function action(label,cls,fn){var b=make("button","btn "+(cls||""),label);b.type="button";b.addEventListener("click",fn);return b;}
+      function todayISO(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+      function dayDiff(iso){if(!iso)return Infinity;var t=new Date(todayISO()+"T12:00:00");var d=new Date(iso+"T12:00:00");return Math.round((d-t)/86400000);}
+      function niceDate(iso){if(!iso)return "No date set";var d=new Date(iso+"T12:00:00");return isNaN(d)?"No date set":d.toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"});}
+      function ringgit(value){return "RM "+Number(value).toLocaleString("en-MY",{maximumFractionDigits:0});}
+      function amount(value){var n=Number(value);return Number.isFinite(n)&&n>=0?n:0;}
+      function cleanEvent(raw){var e=Object.assign({},defaultEvent),source=raw&&typeof raw==="object"?raw:{};Object.keys(e).forEach(function(k){if(source[k]!==undefined)e[k]=String(source[k]).slice(0,120);});if(!/^\d{4}-\d{2}-\d{2}$/.test(e.eventDate))e.eventDate="";if(!["In person","Online"].includes(e.eventFormat))e.eventFormat="In person";if(!["Group reflection","Individual mini readings"].includes(e.tarotFormat))e.tarotFormat="Group reflection";e.expectedGuests=String(Math.max(1,Math.min(25,Math.round(amount(e.expectedGuests)||15))));["ticketPrice","venueCost","materialsPerGuest","fixedCosts","desiredEarnings"].forEach(function(k){e[k]=e[k]===""?"":String(amount(e[k]));});return e;}
+      function hydrateEventForm(){var f=qs("#eventDetailsForm");Object.keys(defaultEvent).forEach(function(key){if(f.elements[key])f.elements[key].value=state.event[key]===undefined?defaultEvent[key]:state.event[key];});calculatePrice();}
+      function calculatePrice(){var f=qs("#eventDetailsForm"),guests=Math.max(1,Math.min(25,Math.round(amount(f.elements.expectedGuests.value)||15))),hasCosts=["venueCost","materialsPerGuest","fixedCosts"].some(function(k){return f.elements[k].value!=="";}),cost=amount(f.elements.venueCost.value)+amount(f.elements.fixedCosts.value)+amount(f.elements.materialsPerGuest.value)*guests,earnings=amount(f.elements.desiredEarnings.value),ticket=amount(f.elements.ticketPrice.value);qs("#estimatedCost").textContent=hasCosts?ringgit(Math.ceil(cost)):"Add costs";qs("#breakEven").textContent=hasCosts?ringgit(Math.ceil(cost/guests)):"Add costs";qs("#targetPrice").textContent=hasCosts?ringgit(Math.ceil((cost+earnings)/guests)):"Add costs";qs("#pricingNote").textContent=guests+" expected paid guests is a planning assumption; maximum capacity is 25. "+(ticket&&hasCosts?"At "+ringgit(ticket)+" per ticket, estimated remainder after entered costs is "+ringgit(Math.round(ticket*guests-cost))+". ":"")+"Include payment fees in fixed costs if applicable.";}
+      function statusLabel(s){return({"new":"New enquiry","details-sent":"Details sent","awaiting-payment":"Awaiting payment","confirmed":"Confirmed","completed":"Completed"})[s]||"New enquiry";}
+      function toast(message){var e=qs("#toast");e.textContent=message;e.classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(function(){e.classList.remove("show");},3000);}
+      function switchView(id){currentView=id;document.querySelectorAll(".view").forEach(function(e){e.classList.toggle("active",e.id===id);});document.querySelectorAll("[data-view]").forEach(function(e){e.classList.toggle("active",e.dataset.view===id);if(e.dataset.view===id)e.setAttribute("aria-current","page");else e.removeAttribute("aria-current");});window.scrollTo({top:0,behavior:"smooth"});}
+      function priorities(){
+        var items=[];
+        state.clients.forEach(function(c){
+          var due=dayDiff(c.followUp);
+          if(c.status==="new")items.push({title:"Reply to "+c.name,detail:c.service+" · New WhatsApp enquiry",view:"clients",score:110});
+          else if(c.status==="awaiting-payment")items.push({title:"Check payment for "+c.name,detail:"Confirm only when payment is verified",view:"clients",score:95});
+          else if(c.status==="confirmed"&&dayDiff(c.sessionDate)>=0&&dayDiff(c.sessionDate)<=2)items.push({title:"Send "+c.name+" an appointment reminder",detail:"Session "+niceDate(c.sessionDate),view:"clients",score:90});
+          if(due<=0&&c.status!=="new"&&c.status!=="awaiting-payment")items.push({title:"Follow up with "+c.name,detail:c.service+" · Follow-up due "+niceDate(c.followUp),view:"clients",score:85});
+        });
+        state.tasks.filter(function(t){return!t.done;}).forEach(function(t){var diff=dayDiff(t.due);items.push({title:t.title,detail:t.category+" · "+(diff<0?"Overdue "+niceDate(t.due):diff===0?"Due today":t.due?"Due "+niceDate(t.due):"No due date"),view:"events",score:(diff<0?85:diff<=7?75:35)+(t.priority==="high"?10:0)});});
+        return items.sort(function(a,b){return b.score-a.score;});
+      }
+      function renderOverview(){
+        qs("#todayLabel").textContent=new Date().toLocaleDateString("en-MY",{weekday:"long",day:"numeric",month:"long"});
+        qs("#newCount").textContent=state.clients.filter(function(c){return c.status==="new";}).length;
+        qs("#paymentCount").textContent=state.clients.filter(function(c){return c.status==="awaiting-payment";}).length;
+        qs("#confirmedCount").textContent=state.clients.filter(function(c){return c.status==="confirmed";}).length;
+        qs("#dueCount").textContent=state.tasks.filter(function(t){return!t.done&&dayDiff(t.due)<=7;}).length;
+        var items=priorities(),first=items[0];
+        qs("#focusTitle").textContent=first?first.title:"You’re clear for now";
+        qs("#focusText").textContent=first?first.detail+" · Open it and take the next small step.":"Add a client enquiry or your next event task when it comes in.";
+        qs("#focusButton").textContent=first?"Open "+(first.view==="clients"?"client desk":"tasks")+" →":"Open client desk →";
+        qs("#focusButton").onclick=function(){switchView(first?first.view:"clients");};
+        var list=qs("#priorityList");list.replaceChildren();
+        if(!items.length){var empty=make("div","empty");empty.append(make("h3","","Nothing urgent right now."),make("p","","Enjoy the breathing room, Lynn."));list.append(empty);}
+        items.slice(0,5).forEach(function(p){var row=make("div","item"),dot=make("span","dot"+(p.detail.indexOf("Overdue")>=0?" red":"")),body=make("div","item-body"),small=make("small","",p.detail);body.append(make("strong","",p.title),small);row.append(dot,body,action("Open","btn-small",function(){switchView(p.view);}));list.append(row);});
+        var eventTasks=state.tasks.filter(function(t){return t.category==="Christmas event";}),complete=eventTasks.filter(function(t){return t.done;}).length;
+        qs("#eventProgress").style.width=(eventTasks.length?Math.round(complete/eventTasks.length*100):0)+"%";
+        qs("#eventProgressText").textContent=complete+" of "+eventTasks.length+" planning tasks complete";
+        qs("#eventDateTag").textContent=state.event.eventDate?niceDate(state.event.eventDate):"Mid-Dec 2026";
+        qs("#eventOverviewText").textContent="Tarot reflection · Meditation · Short sound bath · Manifesting\nUp to 25 guests · "+(state.event.ticketPrice?ringgit(state.event.ticketPrice):"Price to confirm")+" · "+(state.event.venue||"Venue to confirm");
+      }
+      function renderEventSummary(){var e=state.event;qs("#eventNotice").textContent="Christmas event: "+(e.eventDate?niceDate(e.eventDate):"mid-December 2026, exact date to confirm")+" · Maximum 25 guests · "+(e.ticketPrice?"Ticket "+ringgit(e.ticketPrice):"Ticket price to confirm")+" · "+(e.venue||"Venue or platform to confirm")+". Planning task dates are suggested targets.";}
+      function clientMessage(c){
+        var name=c.name,service=c.service.toLowerCase();
+        if(c.status==="new")return "Hi "+name+"! Thanks for reaching out to Mystic Blessings. I’d be happy to talk about "+service+". What’s been on your mind, and what would you hope to get from a session? I’ll share the practical details once I know what fits you best. ✨";
+        if(c.status==="details-sent")return "Hi "+name+"! Just checking in after the "+service+" details I sent. Is there anything you’d like me to clarify before you decide? No pressure — happy to help you work out what feels useful.";
+        if(c.status==="awaiting-payment")return "Hi "+name+"! Just checking whether you had a chance to look at the payment details for your "+service+" session. Once I’ve checked the payment, I’ll confirm your booking. Let me know if you have any questions.";
+        if(c.status==="confirmed")return "Hi "+name+"! A friendly reminder about your "+service+" session"+(c.sessionDate?" on "+niceDate(c.sessionDate):"")+". Let me know if there’s anything you’d like me to know beforehand. See you soon! ✨";
+        return "Hi "+name+"! I hope you’ve been well since our "+service+" session. What’s one small, practical step you’ve taken from what we discussed? I’d love to hear how you’re doing.";
+      }
+      function renderClients(){
+        var list=qs("#clientList");list.replaceChildren();
+        qs("#clientSummary").textContent=state.clients.length?state.clients.length+" conversation"+(state.clients.length===1?"":"s")+" tracked.":"No clients added yet.";
+        if(!state.clients.length){var empty=make("div","empty");empty.append(make("h3","","Your client desk is ready."),make("p","","Add your next WhatsApp enquiry and this space will help you keep it moving."));list.append(empty);return;}
+        state.clients.slice().sort(function(a,b){return(b.created||"").localeCompare(a.created||"");}).forEach(function(c){
+          var row=make("article","record"),left=make("div"),meta=make("div","meta"),title=make("h3","",c.name),info=make("p","",c.service+(c.sessionDate?" · Session "+niceDate(c.sessionDate):"")+(c.followUp?" · Follow up "+niceDate(c.followUp):""));
+          var tag=make("span","tag"+(c.status==="awaiting-payment"?" warm":c.status==="new"?" rose":""),statusLabel(c.status));meta.append(tag);if(c.phone)meta.append(make("span","subtle",c.phone));left.append(meta,title,info);if(c.note)left.append(make("p","",c.note));
+          var buttons=make("div","record-actions");
+          buttons.append(action("Copy reply","btn-small",function(){copyText(clientMessage(c));}));
+          var next=({"new":["Details sent","details-sent"],"details-sent":["QR sent","awaiting-payment"],"awaiting-payment":["Verify payment","confirmed"],"confirmed":["Session complete","completed"]})[c.status];
+          if(next)buttons.append(action(next[0],"btn-small btn-primary",function(){
+            if(c.status==="awaiting-payment"&&!confirm("Have you checked that "+c.name+"'s payment arrived? Confirm the booking only after verification."))return;
+            c.status=next[1];save();toast(statusLabel(c.status)+".");
+          }));
+          buttons.append(action("Remove","btn-small btn-quiet",function(){if(confirm("Remove "+c.name+" from this tracker?")){state.clients=state.clients.filter(function(x){return x.id!==c.id;});save();toast("Client removed.");}}));
+          row.append(left,buttons);list.append(row);
+        });
+      }
+      function renderTasks(){
+        var list=qs("#taskList");list.replaceChildren();
+        var sorted=state.tasks.slice().sort(function(a,b){return Number(a.done)-Number(b.done)||(a.due||"9999").localeCompare(b.due||"9999")||({high:0,medium:1,low:2}[a.priority]-{high:0,medium:1,low:2}[b.priority]);});
+        var done=state.tasks.filter(function(t){return t.done;}).length;
+        qs("#taskSummary").textContent=done+" of "+state.tasks.length+" complete.";
+        if(!sorted.length){var empty=make("div","empty");empty.append(make("h3","","No tasks yet."),make("p","","Add one small next step for your event or business."));list.append(empty);return;}
+        sorted.forEach(function(t){
+          var row=make("article","record"+(t.done?" task-done":"")),check=make("input","check"),left=make("div"),meta=make("div","meta"),buttons=make("div","record-actions");
+          check.type="checkbox";check.checked=!!t.done;check.setAttribute("aria-label","Mark "+t.title+" complete");check.addEventListener("change",function(){t.done=check.checked;save();});
+          meta.append(make("span","tag"+(t.priority==="high"?" warm":""),t.category),make("span","subtle",t.due?"Due "+niceDate(t.due):"No due date"));
+          left.append(meta,make("h3","",t.title));if(t.note)left.append(make("p","",t.note));
+          buttons.append(action("Remove","btn-small btn-quiet",function(){if(confirm("Remove this task?")){state.tasks=state.tasks.filter(function(x){return x.id!==t.id;});save();toast("Task removed.");}}));
+          row.append(check,left,buttons);list.append(row);
+        });
+      }
+      var templates=[
+        {title:"New enquiry",text:"Hi! Thanks for reaching out to Mystic Blessings. What’s been on your mind, and which service are you interested in — tarot reading, sound healing, or pet communication? I’ll help you find a good next step. ✨"},
+        {title:"Booking details",text:"Hi! Here are the details for your session: [service], [date and time], [location or online link], [price]. If that works for you, I’ll send my payment QR through WhatsApp. I’ll confirm the booking after I’ve checked the payment."},
+        {title:"Payment QR note",text:"Here’s the QR code for your [service] session. Please send me your payment confirmation and the name for the booking. I’ll check it and then confirm your place. [Attach your QR image before sending.]"},
+        {title:"After-session check-in",text:"Hi! I hope you’ve had a little space to reflect since our session. What’s one practical step you’d like to take this week? It can be small — the point is to make it real. ✨"},
+        {title:"Christmas event interest",kind:"event"}
+      ];
+      function eventInvite(){var e=state.event,when=e.eventDate?"on "+niceDate(e.eventDate):"in mid-December",where=e.venue?" at "+e.venue:"",price=e.ticketPrice?" Tickets are "+ringgit(e.ticketPrice)+".":" The ticket price is still being confirmed.";return "Hi! I’m planning a small Mystic Blessings Christmas gathering "+when+where+" with group tarot reflection, meditation, a short sound bath, and a manifesting activity. We’ll have up to 25 guests."+price+" Would you like me to send you the booking details? ✨";}
+      function renderTemplates(){var grid=qs("#templateGrid");grid.replaceChildren();templates.forEach(function(t){var card=make("article","template-card"),message=t.kind==="event"?eventInvite():t.text;card.append(make("h3","",t.title),make("p","",message),action("Copy message","btn-small",function(){copyText(message);}));grid.append(card);});}
+      function copyText(value){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(function(){toast("Copied. Personalize before sending.");}).catch(function(){copyFallback(value);});}else copyFallback(value);}
+      function copyFallback(value){var area=make("textarea");area.value=value;area.style.position="fixed";area.style.left="-9999px";document.body.append(area);area.select();try{document.execCommand("copy");toast("Copied. Personalize before sending.");}catch(e){toast("Copy failed. Please select the text manually.");}area.remove();}
+      function render(){renderOverview();renderEventSummary();renderClients();renderTasks();renderTemplates();}
+      document.querySelectorAll("[data-view]").forEach(function(b){b.addEventListener("click",function(){switchView(b.dataset.view);});});
+      document.querySelectorAll("[data-go]").forEach(function(b){b.addEventListener("click",function(){switchView(b.dataset.go);});});
+      qs("#showClientForm").onclick=function(){qs("#clientForm").classList.add("open");qs("#clientForm [name=name]").focus();};
+      qs("#cancelClientForm").onclick=function(){qs("#clientForm").reset();qs("#clientForm").classList.remove("open");};
+      qs("#clientForm").addEventListener("submit",function(e){e.preventDefault();var f=new FormData(e.target),name=String(f.get("name")||"").trim();if(!name)return;state.clients.push({id:"client-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),name:name.slice(0,80),service:String(f.get("service")||"Other"),phone:String(f.get("phone")||"").trim().slice(0,30),sessionDate:String(f.get("sessionDate")||""),followUp:String(f.get("followUp")||""),note:String(f.get("note")||"").trim().slice(0,500),status:"new",created:new Date().toISOString()});e.target.reset();e.target.classList.remove("open");save();toast("Enquiry saved.");});
+      qs("#showTaskForm").onclick=function(){qs("#taskForm").classList.add("open");qs("#taskForm [name=title]").focus();};
+      qs("#cancelTaskForm").onclick=function(){qs("#taskForm").reset();qs("#taskForm").classList.remove("open");};
+      qs("#taskForm").addEventListener("submit",function(e){e.preventDefault();var f=new FormData(e.target),title=String(f.get("title")||"").trim();if(!title)return;state.tasks.push({id:"task-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),title:title.slice(0,130),due:String(f.get("due")||""),priority:String(f.get("priority")||"medium"),category:String(f.get("category")||"Business operations"),note:String(f.get("note")||"").trim().slice(0,500),done:false});e.target.reset();e.target.classList.remove("open");save();toast("Task saved.");});
+      qs("#eventDetailsForm").addEventListener("input",calculatePrice);
+      qs("#eventDetailsForm").addEventListener("change",calculatePrice);
+      qs("#eventDetailsForm").addEventListener("submit",function(e){
+        e.preventDefault();
+        var f=new FormData(e.target),next={};
+        Object.keys(defaultEvent).forEach(function(key){next[key]=String(f.get(key)||"").trim();});
+        next.expectedGuests=String(Math.max(1,Math.min(25,Math.round(amount(next.expectedGuests)||15))));
+        next.venue=next.venue.slice(0,120);
+        if(next.tarotFormat==="Individual mini readings")toast("For 25 guests, plan extra readers or a longer session.");
+        state.event=next;
+        save();
+        toast("Christmas event details saved.");
+      });
+      qs("#exportBtn").onclick=function(){var blob=new Blob([JSON.stringify({app:"Mystic Blessings Command Centre",version:2,exportedAt:new Date().toISOString(),clients:state.clients,tasks:state.tasks,event:state.event},null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=make("a");a.href=url;a.download="mystic-blessings-backup-"+todayISO()+".json";document.body.append(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);toast("Backup downloaded.");};
+      qs("#importBtn").onclick=function(){qs("#importFile").click();};
+      qs("#importFile").addEventListener("change",function(e){var file=e.target.files[0];if(!file)return;if(file.size>2000000){toast("That backup is too large.");e.target.value="";return;}file.text().then(function(content){var data=JSON.parse(content);if(!data||!Array.isArray(data.clients)||!Array.isArray(data.tasks))throw Error("Invalid backup");if(!confirm("Replace all current client, task, and event details with this backup?"))return;state={clients:data.clients.filter(function(c){return c&&typeof c.name==="string";}).map(function(c){return{id:String(c.id||"client-"+Math.random()),name:c.name.slice(0,80),service:String(c.service||"Other").slice(0,50),phone:String(c.phone||"").slice(0,30),sessionDate:String(c.sessionDate||"").slice(0,10),followUp:String(c.followUp||"").slice(0,10),note:String(c.note||"").slice(0,500),status:["new","details-sent","awaiting-payment","confirmed","completed"].includes(c.status)?c.status:"new",created:String(c.created||"")};}),tasks:data.tasks.filter(function(t){return t&&typeof t.title==="string";}).map(function(t){return{id:String(t.id||"task-"+Math.random()),title:t.title.slice(0,130),due:String(t.due||"").slice(0,10),priority:["high","medium","low"].includes(t.priority)?t.priority:"medium",category:String(t.category||"Business operations").slice(0,60),note:String(t.note||"").slice(0,500),done:!!t.done};}),event:cleanEvent(data.event)};hydrateEventForm();save();toast("Backup imported.");}).catch(function(){toast("Could not read that backup file.");}).finally(function(){e.target.value="";});});
+      hydrateEventForm();render();switchView("overview");
+    })();
+  </script>
+</body>
+</html>
