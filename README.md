@@ -21,6 +21,10 @@ A private planning and client tracker for Lynn at Mystic Blessings. Vercel hosts
 
 The first sign-in creates an empty private workspace with the Christmas planning tasks. Keep the site address private if you prefer, although its client records remain protected by sign-in and database access rules.
 
+### If sign-in returns HTTP 429
+
+Check your inbox for an earlier link and use it before requesting another. Supabase normally allows one magic-link request per email address per 60 seconds. Its built-in mail service is also limited to two emails per project per hour. If you reached that hourly limit, wait for it to reset or configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp). Supabase shows your project's limits under **Authentication → Rate Limits**. The sign-in screen temporarily disables repeat requests and displays the Auth error code when available.
+
 ## Features
 
 - Track enquiries, booking stages, payment verification, appointments, and follow-ups.
