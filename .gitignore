@@ -1,2 +1,9 @@
 # Browser exports can contain client information.
 mystic-blessings-backup-*.json
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.vercel/
+.edge-test/

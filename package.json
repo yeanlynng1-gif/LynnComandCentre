@@ -1,0 +1,28 @@
+{
+  "name": "mystic-blessings-command-centre",
+  "version": "1.0.0",
+  "description": "Private planning and client tracker for Mystic Blessings.",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yeanlynng1-gif/LynnComandCentre.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yeanlynng1-gif/LynnComandCentre/issues"
+  },
+  "homepage": "https://github.com/yeanlynng1-gif/LynnComandCentre#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0"
+  },
+  "devDependencies": {
+    "vite": "7.3.7"
+  }
+}

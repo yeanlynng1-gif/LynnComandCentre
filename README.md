@@ -1,26 +1,45 @@
 # Mystic Blessings Command Centre
 
-A single-file planning and client tracker for Lynn at Mystic Blessings. Open `index.html` in a browser; it needs no build step or external packages.
+A private planning and client tracker for Lynn at Mystic Blessings. Vercel hosts the app; Supabase provides email sign-in and stores each user's workspace.
 
-## What it does
+## Set up your live app
 
-- Tracks enquiries, booking stages, payment verification, appointments, and follow-ups.
-- Shows the next client or event task that needs attention.
-- Contains the Christmas 2026 event strategy, two-hour run sheet, promotion sequence, and booking checklist.
-- Saves event decisions and estimates ticket break-even and a ticket price that includes desired earnings.
-- Offers WhatsApp message starters to copy and personalize.
-- Exports and imports a JSON backup.
+1. In your own [Supabase dashboard](https://supabase.com/dashboard), create a new project named **Mystic Blessings Command Centre**. Choose a region near you, such as Singapore.
+2. Open that project's **SQL Editor**. Paste and run the full contents of [`supabase/migrations/20261024_create_workspaces.sql`](supabase/migrations/20261024_create_workspaces.sql). This creates the private workspace table and its access rules.
+3. In Supabase, open **Connect** or **Settings → API Keys**. Copy the **Project URL** and a key beginning with `sb_publishable_`. Do not use the secret or service role key.
+4. In [Vercel](https://vercel.com/new), choose **Import Git Repository** and select `yeanlynng1-gif/LynnComandCentre`. Vercel should recognize **Vite**. The build command is `npm run build`, and the output directory is `dist`.
+5. Before deploying, add these Vercel **Environment Variables** for **Production** (and **Preview** if you plan to use previews):
 
-## Data and payments
+   | Name | Value |
+   | --- | --- |
+   | `VITE_SUPABASE_URL` | Your Supabase Project URL |
+   | `VITE_SUPABASE_PUBLISHABLE_KEY` | Your Supabase publishable key |
 
-Records are saved in this browser's local storage. They are not sent to GitHub or a server by this app. Use **Export backup** regularly, especially before clearing browser data or moving to another device.
+6. Deploy. Copy the final Vercel address, such as `https://your-project.vercel.app`.
+7. In Supabase, open **Authentication → URL Configuration**. Set the **Site URL** to that Vercel address and add the same address to **Redirect URLs**. Sign-in links must return to this site.
+8. Open the Vercel site and sign in with your email. For the default Supabase email service, use an address that belongs to a member of the Supabase project team. To send sign-in links to another address, configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp) first.
 
-If you open the app from GitHub Pages, that web address has separate browser storage from the local `index.html` file. Export from the local app and import the backup into the web version if you want to move your records.
+The first sign-in creates an empty private workspace with the Christmas planning tasks. Keep the site address private if you prefer, although its client records remain protected by sign-in and database access rules.
 
-The app prepares WhatsApp text; Lynn sends messages and the QR image herself. Mark a booking confirmed only after checking that payment arrived.
+## Features
 
-Do not commit exported backup JSON files containing client information to this repository.
+- Track enquiries, booking stages, payment verification, appointments, and follow-ups.
+- See the next client or event task that needs attention.
+- Plan the Christmas 2026 event, calculate ticket prices, and use WhatsApp message starters.
+- Export and import JSON backups. Importing replaces the signed-in user's current workspace.
 
-## Optional hosting
+The app drafts WhatsApp messages; it does not send them or process QR payments. Verify payment before marking a booking confirmed.
 
-Because the entry file is named `index.html`, the repository can be served as a static site with GitHub Pages from the repository root. No build process is needed.
+## Local development
+
+1. Install Node.js 22 or later and run `npm ci`.
+2. Copy `.env.example` to `.env.local` and fill in your Supabase project URL and **publishable** key. Never put a secret or service role key in a Vite variable.
+3. Run the migration in `supabase/migrations` on your Supabase project.
+4. In Supabase Auth URL Configuration, allow `http://localhost:5173` as a redirect URL for local testing.
+5. Run `npm run dev`.
+
+`npm run build` produces the static Vercel site in `dist`.
+
+The Supabase `public.workspaces` table has row level security policies tied to the signed-in user ID. No service role key belongs in this repository or in Vercel frontend variables. Only the public site shell is served by Vercel; client data is fetched after sign-in.
+
+To move records from the old local HTML version, use **Export backup** there, sign in to the hosted app, then use **Import**. Keep the downloaded backup private and do not commit it to GitHub.
